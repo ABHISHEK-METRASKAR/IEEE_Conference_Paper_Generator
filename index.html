@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IEEE Format Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════ APP HEADER ══════════════ -->
+<header class="app-header">
+  <div class="header-left">
+    <div class="logo-mark">IEEE</div>
+    <div class="logo-text">
+      <span class="logo-title">Format Maker</span>
+      <span class="logo-sub">Conference Paper Generator</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="validatePaper()">✓ Validate</button>
+    <button class="btn btn-ghost" onclick="copyText()">⎘ Copy Text</button>
+    <button class="btn btn-ghost" onclick="clearAll()">↺ Clear</button>
+    <button class="btn btn-primary" onclick="printPaper()">⬇ Save PDF</button>
+  </div>
+  
+  <div class="contact-links">
+    
+    
+    <!-- GitHub -->
+    <a href="https://github.com/your-username" target="_blank">
+      <img src="https://img.icons8.com/ios-glyphs/20/000000/github.png"/>
+    </a>
+    <h3 style="color: white;">abhishekmetraskar@gmail.com</h3>
+
+  </div>
+  
+</header>
+
+<!-- ══════════════ TAB BAR ══════════════ -->
+<nav class="tab-bar">
+  <div class="tab-group">
+    <button class="tab active" data-tab="header"   onclick="switchTab('header')">◈ Header</button>
+    <button class="tab"        data-tab="sections" onclick="switchTab('sections')">≡ Sections</button>
+    <button class="tab"        data-tab="custom"   onclick="switchTab('custom')">+ Custom</button>
+    <button class="tab"        data-tab="media"    onclick="switchTab('media')">⊞ Media</button>
+  </div>
+  <div class="tab-progress">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-label" id="progressLabel">0% complete</span>
+  </div>
+</nav>
+
+<!-- ══════════════ WORKSPACE ══════════════ -->
+<div class="workspace">
+
+  <!-- ════ LEFT: FORM EDITOR ════ -->
+  <div class="editor-panel" id="editorPanel">
+
+    <!-- TAB: HEADER -->
+    <div class="tab-content active" id="tab-header">
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> Paper Title</div>
+        <div class="field-wrap">
+          <textarea class="finput tall" id="f-title" rows="2" placeholder="Conference Paper Title"
+            oninput="updateBadge('f-title');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-title">required</div>
+        </div>
+        <p class="fhint">Do not use symbols, special characters, or math in the title.</p>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label">
+          <span class="stag req">REQUIRED</span> Authors
+          <button class="add-btn" onclick="addAuthor()">+ Add Author</button>
+        </div>
+        <div id="authorsList"></div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label">
+          <span class="stag req">REQUIRED</span> Abstract
+          <span class="wcbadge" id="wc-abstract">0 words</span>
+        </div>
+        <div class="field-wrap">
+          <textarea class="finput" id="f-abstract" rows="5"
+            placeholder="This document is a model and instructions…"
+            oninput="updateBadge('f-abstract');wcUpdate('f-abstract','wc-abstract');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-abstract">required</div>
+        </div>
+        <p class="fhint">150–250 words. No symbols, footnotes, or math.</p>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> Keywords</div>
+        <div class="field-wrap">
+          <input class="finput" type="text" id="f-keywords"
+            placeholder="component, formatting, style, styling, insert"
+            oninput="updateBadge('f-keywords');updateProgress();syncToPreview();"/>
+          <div class="fbadge" id="badge-f-keywords">required</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label">
+          Acknowledgment <span class="stag opt">OPTIONAL</span>
+          <span class="wcbadge" id="wc-ack">0 words</span>
+        </div>
+        <textarea class="finput" id="f-ack" rows="3"
+          placeholder="The preferred spelling…"
+          oninput="wcUpdate('f-ack','wc-ack');syncToPreview();"></textarea>
+      </div>
+
+    </div><!-- /tab-header -->
+
+    <!-- TAB: SECTIONS -->
+    <div class="tab-content" id="tab-sections">
+      <div class="hint-box">
+        <b>💡 Tip:</b> Type in the left panel <em>or</em> click directly on text in the live preview to edit. Use the toolbar above the preview for bold, italic, headings, lists etc.
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> I. Introduction <span class="wcbadge" id="wc-intro">0 words</span></div>
+        <div class="field-wrap">
+          <textarea class="finput sectarea" id="f-intro" rows="7"
+            placeholder="Write your introduction here…"
+            oninput="updateBadge('f-intro');wcUpdate('f-intro','wc-intro');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-intro">required</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label">II. Literature Review <span class="stag opt">OPTIONAL</span> <span class="wcbadge" id="wc-lit">0 words</span></div>
+        <textarea class="finput sectarea" id="f-lit" rows="7"
+          placeholder="Previous approaches have…"
+          oninput="wcUpdate('f-lit','wc-lit');syncToPreview();"></textarea>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> III. Methodology <span class="wcbadge" id="wc-method">0 words</span></div>
+        <div class="field-wrap">
+          <textarea class="finput sectarea" id="f-method" rows="7"
+            placeholder="Our proposed approach consists of…"
+            oninput="updateBadge('f-method');wcUpdate('f-method','wc-method');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-method">required</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> IV. Results &amp; Discussion <span class="wcbadge" id="wc-results">0 words</span></div>
+        <div class="field-wrap">
+          <textarea class="finput sectarea" id="f-results" rows="7"
+            placeholder="The proposed method achieves…"
+            oninput="updateBadge('f-results');wcUpdate('f-results','wc-results');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-results">required</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> V. Conclusion <span class="wcbadge" id="wc-conc">0 words</span></div>
+        <div class="field-wrap">
+          <textarea class="finput sectarea" id="f-conc" rows="5"
+            placeholder="In this paper, we presented…"
+            oninput="updateBadge('f-conc');wcUpdate('f-conc','wc-conc');updateProgress();syncToPreview();"></textarea>
+          <div class="fbadge" id="badge-f-conc">required</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="fsec-label"><span class="stag req">REQUIRED</span> References <button class="add-btn" onclick="addReference()">+ Add</button></div>
+        <div id="referencesList"></div>
+        <p class="fhint">IEEE: Author, "Title," <em>Journal</em>, vol. X, pp. Y–Z, Year.</p>
+      </div>
+    </div><!-- /tab-sections -->
+
+    <!-- TAB: CUSTOM -->
+    <div class="tab-content" id="tab-custom">
+      <div class="empty-state" id="customEmpty">
+        <div class="empty-icon">⊕</div>
+        <p>No custom sections yet.</p>
+        <button class="btn btn-primary" onclick="addCustomSection()">+ Add Custom Section</button>
+      </div>
+      <div id="customSectionsList"></div>
+      <div id="customAddBtn" style="display:none;margin-top:1rem;">
+        <button class="btn btn-outline" onclick="addCustomSection()">+ Add Another</button>
+      </div>
+    </div>
+
+    <!-- TAB: MEDIA -->
+    <div class="tab-content" id="tab-media">
+      <div class="media-type-toggle">
+        <button class="media-toggle-btn active" id="toggleFigures" onclick="showMediaTab('figures')">🖼 Figures</button>
+        <button class="media-toggle-btn"        id="toggleTables"  onclick="showMediaTab('tables')">⊞ Tables</button>
+      </div>
+      <div id="figuresPanel">
+        <div class="empty-state" id="figuresEmpty">
+          <div class="empty-icon">🖼</div><p>No figures yet.</p>
+          <button class="btn btn-primary" onclick="addFigure()">+ Add Figure</button>
+        </div>
+        <div id="figuresList"></div>
+        <div id="figureAddBtn" style="display:none;margin-top:.8rem;">
+          <button class="btn btn-outline" onclick="addFigure()">+ Add Another Figure</button>
+        </div>
+      </div>
+      <div id="tablesPanel" style="display:none;">
+        <div class="empty-state" id="tablesEmpty">
+          <div class="empty-icon">⊞</div><p>No tables yet.</p>
+          <button class="btn btn-primary" onclick="addTable()">+ Add Table</button>
+        </div>
+        <div id="tablesList"></div>
+        <div id="tableAddBtn" style="display:none;margin-top:.8rem;">
+          <button class="btn btn-outline" onclick="addTable()">+ Add Another Table</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /editor-panel -->
+
+  <!-- ════ RIGHT: LIVE PREVIEW with MS-Word Toolbar ════ -->
+  <div class="preview-panel">
+
+    <!-- MS-WORD STYLE TOOLBAR -->
+    <div class="word-toolbar" id="wordToolbar">
+      <!-- Undo/Redo -->
+      <div class="tb-group">
+        <button class="tb-btn" title="Undo (Ctrl+Z)" onclick="doc('undo')">↩</button>
+        <button class="tb-btn" title="Redo (Ctrl+Y)" onclick="doc('redo')">↪</button>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Font family -->
+      <div class="tb-group">
+        <select class="tb-select" id="sel-font" title="Font" onchange="applyFont(this.value)">
+          <option value="'Times New Roman',serif">Times New Roman</option>
+          <option value="Arial,sans-serif">Arial</option>
+          <option value="'Courier New',monospace">Courier New</option>
+          <option value="Georgia,serif">Georgia</option>
+          <option value="Verdana,sans-serif">Verdana</option>
+        </select>
+        <!-- Font size -->
+        <select class="tb-select sm" id="sel-size" title="Font Size" onchange="applyFontSize(this.value)">
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10" selected>10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="14">14</option>
+          <option value="16">16</option>
+          <option value="18">18</option>
+          <option value="20">20</option>
+          <option value="24">24</option>
+        </select>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Text style -->
+      <div class="tb-group">
+        <button class="tb-btn fmt" id="btn-bold"      title="Bold (Ctrl+B)"      onclick="fmt('bold')"><b>B</b></button>
+        <button class="tb-btn fmt" id="btn-italic"    title="Italic (Ctrl+I)"    onclick="fmt('italic')"><i>I</i></button>
+        <button class="tb-btn fmt" id="btn-underline" title="Underline (Ctrl+U)" onclick="fmt('underline')"><u>U</u></button>
+        <button class="tb-btn fmt" id="btn-strike"    title="Strikethrough"      onclick="fmt('strikeThrough')"><s>S</s></button>
+        <button class="tb-btn fmt" id="btn-super"     title="Superscript"        onclick="fmt('superscript')">x²</button>
+        <button class="tb-btn fmt" id="btn-sub"       title="Subscript"          onclick="fmt('subscript')">x₂</button>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Alignment -->
+      <div class="tb-group">
+        <button class="tb-btn" title="Align Left"    onclick="doc('justifyLeft')">⬤≡</button>
+        <button class="tb-btn" title="Center"        onclick="doc('justifyCenter')">≡</button>
+        <button class="tb-btn" title="Align Right"   onclick="doc('justifyRight')">≡⬤</button>
+        <button class="tb-btn" title="Justify"       onclick="doc('justifyFull')">&#x2630;</button>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Lists -->
+      <div class="tb-group">
+        <button class="tb-btn" title="Bullet List"   onclick="doc('insertUnorderedList')">&#x2022;&#x2261;</button>
+        <button class="tb-btn" title="Numbered List" onclick="doc('insertOrderedList')">1&#x2261;</button>
+        <button class="tb-btn" title="Indent"        onclick="doc('indent')">⇥</button>
+        <button class="tb-btn" title="Outdent"       onclick="doc('outdent')">⇤</button>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- IEEE Headings -->
+      <div class="tb-group">
+        <select class="tb-select md" id="sel-heading" title="IEEE Heading Style" onchange="applyHeading(this.value)">
+          <option value="">— Heading Style —</option>
+          <option value="ieee-h1">IEEE Section (I. TITLE)</option>
+          <option value="ieee-h2">IEEE Subsection (A. Title)</option>
+          <option value="ieee-h3">IEEE Minor (italic run-in)</option>
+          <option value="body">Body Text</option>
+        </select>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Line spacing -->
+      <div class="tb-group">
+        <select class="tb-select sm" id="sel-spacing" title="Line Spacing" onchange="applyLineSpacing(this.value)">
+          <option value="1.0">1.0</option>
+          <option value="1.15" selected>1.15</option>
+          <option value="1.5">1.5</option>
+          <option value="2.0">2.0</option>
+        </select>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Color -->
+      <div class="tb-group">
+        <button class="tb-btn" title="Text Color" onclick="pickColor('foreColor')">
+          <span style="font-size:0.9rem">A</span>
+          <span id="fgColorBar" style="display:block;height:3px;background:#000;margin-top:1px;border-radius:1px;width:14px;"></span>
+        </button>
+        <input type="color" id="fgColorPicker" style="display:none;" oninput="applyColor('foreColor',this.value)"/>
+        <button class="tb-btn" title="Highlight Color" onclick="pickColor('hiliteColor')">
+          <span style="font-size:0.9rem;background:#ffff00;padding:0 2px">H</span>
+        </button>
+        <input type="color" id="bgColorPicker" style="display:none;" value="#ffff00" oninput="applyColor('hiliteColor',this.value)"/>
+      </div>
+      <div class="tb-sep"></div>
+
+      <!-- Clear & Zoom -->
+      <div class="tb-group">
+        <button class="tb-btn" title="Clear Formatting" onclick="doc('removeFormat')">✕<sub>fmt</sub></button>
+        <button class="tb-btn" title="Insert Horizontal Rule" onclick="doc('insertHorizontalRule')">─</button>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-group">
+        <button class="tb-btn" title="Zoom Out" onclick="zoomPreview(-0.1)">−</button>
+        <span class="zoom-lbl" id="zoomLbl">100%</span>
+        <button class="tb-btn" title="Zoom In"  onclick="zoomPreview(0.1)">+</button>
+      </div>
+    </div>
+    <!-- /word-toolbar -->
+
+    <!-- Ruler -->
+    <div class="ruler" id="ruler">
+      <div class="ruler-inner" id="rulerInner"></div>
+    </div>
+
+    <!-- Paper scroll area -->
+    <div class="preview-scroll" id="previewScroll">
+      <div class="preview-zoom-wrap" id="previewZoomWrap">
+        <div class="a4-sheet" id="paperSheet">
+
+          <!-- TITLE (editable) -->
+          <div class="p-title" id="pe-title" contenteditable="true"
+            data-field="f-title"
+            spellcheck="true"
+            onInput="onPreviewEdit(this)"
+            onFocus="onPreviewFocus()"
+            onKeyDown="handleEnterKey(event,this)">
+          </div>
+
+          <!-- AUTHORS (non-editable, synced) -->
+          <div class="p-authors-block" id="pe-authors"></div>
+
+          <!-- COLUMNS -->
+          <div class="p-columns">
+
+            <!-- LEFT COLUMN -->
+            <div class="p-col" id="col-left">
+              <!-- Abstract -->
+              <div class="p-abstract-block">
+                <div class="p-abstract-wrap">
+                  <span class="p-abstract-label">Abstract—</span><span class="p-abstract-sep"> </span><span
+                    class="p-editable-inline" id="pe-abstract"
+                    contenteditable="true" data-field="f-abstract"
+                    spellcheck="true"
+                    onInput="onPreviewEdit(this)"
+                    onFocus="onPreviewFocus()"
+                    onKeyDown="handleEnterKey(event,this)"></span>
+                </div>
+                <div class="p-keywords" id="pe-keywords-wrap" style="display:none">
+                  <span class="p-kw-label">Index Terms—</span> <span id="pe-keywords"></span>
+                </div>
+              </div>
+
+              <!-- Section: Introduction -->
+              <div class="p-section-block" id="block-intro">
+                <div class="p-sec-h1">I. Introduction</div>
+                <div class="p-editable-block" id="pe-intro"
+                  contenteditable="true" data-field="f-intro"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+                <div class="media-slot" id="media-after-intro"></div>
+              </div>
+
+              <!-- Section: Literature Review -->
+              <div class="p-section-block" id="block-lit" style="display:none">
+                <div class="p-sec-h1">II. Literature Review</div>
+                <div class="p-editable-block" id="pe-lit"
+                  contenteditable="true" data-field="f-lit"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+                <div class="media-slot" id="media-after-lit"></div>
+              </div>
+
+              <!-- Section: Methodology -->
+              <div class="p-section-block" id="block-method">
+                <div class="p-sec-h1">III. Methodology</div>
+                <div class="p-editable-block" id="pe-method"
+                  contenteditable="true" data-field="f-method"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+                <div class="media-slot" id="media-after-method"></div>
+              </div>
+            </div><!-- /col-left -->
+
+            <!-- RIGHT COLUMN -->
+            <div class="p-col" id="col-right">
+
+              <!-- Section: Results -->
+              <div class="p-section-block" id="block-results">
+                <div class="p-sec-h1">IV. Results &amp; Discussion</div>
+                <div class="p-editable-block" id="pe-results"
+                  contenteditable="true" data-field="f-results"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+                <div class="media-slot" id="media-after-results"></div>
+              </div>
+
+              <!-- Section: Conclusion -->
+              <div class="p-section-block" id="block-conc">
+                <div class="p-sec-h1">V. Conclusion</div>
+                <div class="p-editable-block" id="pe-conc"
+                  contenteditable="true" data-field="f-conc"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+                <div class="media-slot" id="media-after-conc"></div>
+              </div>
+
+              <!-- Section: Acknowledgment -->
+              <div class="p-section-block" id="block-ack" style="display:none">
+                <div class="p-sec-h1 unnumbered">Acknowledgment</div>
+                <div class="p-editable-block" id="pe-ack"
+                  contenteditable="true" data-field="f-ack"
+                  spellcheck="true"
+                  onInput="onPreviewEdit(this)"
+                  onFocus="onPreviewFocus()"
+                  onKeyDown="handleEnterKey(event,this)"></div>
+              </div>
+
+              <!-- References -->
+              <div class="p-section-block" id="block-refs" style="display:none">
+                <div class="p-sec-h1 unnumbered">References</div>
+                <div class="p-ref-list" id="pe-refs"></div>
+              </div>
+
+            </div><!-- /col-right -->
+          </div><!-- /p-columns -->
+
+        </div><!-- /a4-sheet -->
+      </div><!-- /preview-zoom-wrap -->
+    </div><!-- /preview-scroll -->
+
+  </div><!-- /preview-panel -->
+
+</div><!-- /workspace -->
+
+<!-- VALIDATION MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Validation Checklist</h3>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
